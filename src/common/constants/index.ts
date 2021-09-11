@@ -1,1 +1,1 @@
-export { errorMessages } from './errorMessages';
+export { errorMessages } from './error.messages';

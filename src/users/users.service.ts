@@ -3,7 +3,6 @@ import {
   HttpStatus,
   Injectable,
   Logger,
-  Res,
   Scope
 } from '@nestjs/common';
 
@@ -101,6 +100,10 @@ export class UsersService {
 
       return new UserEntity(user);
     } catch (error) {
+      console.log(
+        '🚀 ~ file: users.service.ts ~ line 105 ~ UsersService ~ updateOneById ~ error',
+        error
+      );
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -112,30 +115,32 @@ export class UsersService {
   }
 
   async deleteOneById(id: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id
-        }
-      });
-
-      if (!user) {
-        throw new HttpException(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            errorMessage: errorMessages.RESOURCE_NOT_FOUND
-          },
-          HttpStatus.BAD_REQUEST
-        );
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id
       }
+    });
 
+    if (!user) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          errorMessage: errorMessages.RESOURCE_NOT_FOUND.replace(
+            '{resource}',
+            'User'
+          )
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    try {
       await this.prisma.user.delete({
         where: {
           id
         }
       });
     } catch (error) {
-      this.logger.log(error);
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,

@@ -1,5 +1,3 @@
-import { serialize } from 'class-transformer';
-
 import {
   Body,
   ClassSerializerInterceptor,
@@ -18,6 +16,8 @@ import {
   ApiTags
 } from '@nestjs/swagger';
 
+import { BadRequestDto } from 'src/common/dto';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -34,13 +34,14 @@ export class UsersController {
 
   @Post()
   @ApiOkResponse({ type: UserEntity })
+  @ApiBadRequestResponse({ type: BadRequestDto })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
-  @ApiBadRequestResponse()
+  @ApiBadRequestResponse({ type: BadRequestDto })
   @ApiInternalServerErrorResponse()
   getAll() {
     return this.usersService.getAll();
@@ -48,7 +49,7 @@ export class UsersController {
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
-  @ApiBadRequestResponse()
+  @ApiBadRequestResponse({ type: BadRequestDto })
   @ApiInternalServerErrorResponse()
   async getOneById(@Param('id') id: string) {
     return new UserEntity(await this.usersService.getOneById(id));
@@ -56,7 +57,7 @@ export class UsersController {
 
   @Patch(':id')
   @ApiOkResponse({ type: UserEntity })
-  @ApiBadRequestResponse()
+  @ApiBadRequestResponse({ type: BadRequestDto })
   @ApiInternalServerErrorResponse()
   updateOneById(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateOneById(id, updateUserDto);
@@ -64,7 +65,7 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOkResponse()
-  @ApiBadRequestResponse()
+  @ApiBadRequestResponse({ type: BadRequestDto })
   @ApiInternalServerErrorResponse()
   deleteOneById(@Param('id') id: string) {
     return this.usersService.deleteOneById(id);
