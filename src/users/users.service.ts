@@ -15,10 +15,10 @@ import { UserEntity } from './entities/user.entity';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class UsersService {
-  constructor(private prisma: PrismaService, private logger: Logger) {}
+  constructor(private prismaService: PrismaService, private logger: Logger) {}
 
   async create(createUserDto: CreateUserDto) {
-    const isEmailAlreayInUsed = await this.prisma.user.count({
+    const isEmailAlreayInUsed = await this.prismaService.user.count({
       where: {
         email: createUserDto.email
       }
@@ -35,7 +35,7 @@ export class UsersService {
     }
 
     try {
-      const user = await this.prisma.user.create({
+      const user = await this.prismaService.user.create({
         data: createUserDto
       });
       return new UserEntity(user);
@@ -52,7 +52,7 @@ export class UsersService {
 
   async getAll() {
     try {
-      const users = await this.prisma.user.findMany();
+      const users = await this.prismaService.user.findMany();
       return users.map((user) => new UserEntity(user));
     } catch (error) {
       throw new HttpException(
@@ -66,7 +66,7 @@ export class UsersService {
   }
 
   async getOneById(id: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id
       }
@@ -88,10 +88,20 @@ export class UsersService {
     return new UserEntity(user);
   }
 
+  async getOneByEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email
+      }
+    });
+
+    return new UserEntity(user);
+  }
+
   async updateOneById(id: string, updateUserDto: UpdateUserDto) {
     try {
       const updatedAt = new Date();
-      const user = await this.prisma.user.update({
+      const user = await this.prismaService.user.update({
         where: {
           id
         },
@@ -115,7 +125,7 @@ export class UsersService {
   }
 
   async deleteOneById(id: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id
       }
@@ -135,7 +145,7 @@ export class UsersService {
     }
 
     try {
-      await this.prisma.user.delete({
+      await this.prismaService.user.delete({
         where: {
           id
         }

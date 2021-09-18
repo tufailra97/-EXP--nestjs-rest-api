@@ -1,12 +1,18 @@
+import { config as dotEnvConfig } from 'dotenv';
+
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { AppModule } from './app.module';
 import { AppConfig } from 'src/common/services';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
+  dotEnvConfig();
   AppConfig.initialise();
+
+  console.log('logger ---- ', AppConfig.getConfigs());
+
   const app = await NestFactory.create(AppModule);
 
   app.enableVersioning({
